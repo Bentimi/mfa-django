@@ -5,6 +5,31 @@ from userApp.models import Otp
 
 User = get_user_model()
 
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+
+    extra_kwargs = {
+         'username': {
+             'error_messages': {
+                 'required': 'Username is required.',
+                 'blank': 'Username cannot be blank.',
+                 'unique': 'This username is already taken.'
+             }
+         },
+         'email': {
+             'error_messages': {
+                 'required': 'Email is required.',
+                 'blank': 'Email cannot be blank.',
+                 'unique': 'This email is already registered.'
+             }
+         },
+     }
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)

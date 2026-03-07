@@ -84,3 +84,36 @@ def get_user_details(request):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_users(request):
+    if request.user.role != "staff" and request.user.role != "admin":
+        return Response({"error": "Forbidden Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def view_user(request, user_id):
+    if request.user.role != "staff" and request.user.role != "admin":
+        return Response({"error": "Forbidden Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if request.method == 'PATCH':
+        serializer = UpdateUserSerializer(user, data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
