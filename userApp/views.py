@@ -1,0 +1,88 @@
+from django.shortcuts import render
+from django.contrib.auth import get_user_model, login
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from userApp.serializers import OtpSerializer
+from userApp.models import Otp
+from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+User =  get_user_model()
+
+# Create your views here.
+
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    serializer = OtpSerializer(data=request.data)
+    userId = request.session.get("otp_user_id")
+    print("User ID from session:", userId)
+
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    code = serializer.validated_data['code']
+    try:
+        otp = Otp.objects.get(user_id=userId, code=code, status=True)
+    except Otp.DoesNotExist:
+        return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if otp.expires_at < timezone.now():
+        return Response({"error": "OTP has expired"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    login(request, otp.user)
+
+    refresh = RefreshToken.for_user(otp.user)
+
+    response = Response({"message": "Login successful"})
+
+    response.set_cookie(
+        "access_token",
+        str(refresh.access_token),
+        httponly=True,
+        secure=True,
+        samesite="Lax"
+    )
+
+    response.set_cookie(
+        "refresh_token",
+        str(refresh),
+        httponly=True,
+        secure=True,
+        samesite="Lax"
+    )
+
+    otp.status = False
+    otp.code = None
+    otp.save()
+
+    del request.session["otp_user_id"]
+
+    return response
+
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+@ensure_csrf_cookie
+def get_user_details(request):
+
+    if request.method == 'GET':
+        user = request.user
+        return Response({
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }, status=status.HTTP_200_OK)
+
+    if request.method == 'PUT':
+        user = request.user
+
+        return Response({
+            "message": "User details updated successfully",
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }, status=status.HTTP_200_OK)

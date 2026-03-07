@@ -1,0 +1,43 @@
+from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from registrationApp.serializers import LoginSerializer
+from django.contrib.auth import get_user_model, login
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from userApp.models import Otp
+import random
+from django.utils import timezone
+
+User = get_user_model()
+
+# Create your views here.
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_user(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        # login(request, user)
+
+        otp_code = str(random.randint(100000, 999999))
+
+        Otp.objects.update_or_create(
+            user=user,
+            defaults={
+                'code': otp_code,
+                'status': True,
+                'expires_at': timezone.now() + timezone.timedelta(minutes=5)
+            }
+        )
+
+        # store user in session
+        request.session["otp_user_id"] = user.id
+        # session  = request.session['otp_user_id']
+        # print("Session user id:", session)
+        return Response({
+            "message": "OTP sent to your email", "otp_code": otp_code
+            }, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
