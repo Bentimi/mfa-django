@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # DEBUG = True
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['https://multifact.vercel.app']
+ALLOWED_HOSTS = ['mfa-django.onrender.com']
 # RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 # if RENDER_EXTERNAL_HOSTNAME:
 #     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
