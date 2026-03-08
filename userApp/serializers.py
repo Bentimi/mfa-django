@@ -4,7 +4,7 @@ User = get_user_model()
 
 
 class OtpSerializer(serializers.Serializer):
-    code = serializers.CharField(required=True, max_length=6)
+    code = serializers.CharField(required=True, max_length=6, trim_whitespace=True)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

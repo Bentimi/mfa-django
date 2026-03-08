@@ -48,6 +48,7 @@ def login_user(request):
         request.session["otp_user_id"] = user.id
         # session  = request.session['otp_user_id']
         # print("Session user id:", session)
+        print(f"OTP for user {user.email}: {otp_code}")  # Log OTP to console for testing
         return Response({
             "message": "OTP sent to your email", "otp_code": otp_code
             }, status=status.HTTP_200_OK)

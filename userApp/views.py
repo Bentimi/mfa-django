@@ -20,7 +20,7 @@ User =  get_user_model()
 def verify_otp(request):
     serializer = OtpSerializer(data=request.data)
     userId = request.session.get("otp_user_id")
-    print("User ID from session:", userId)
+    # print("User ID from session:", userId)
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -34,7 +34,7 @@ def verify_otp(request):
     if otp.expires_at < timezone.now():
         return Response({"error": "OTP has expired"}, status=status.HTTP_400_BAD_REQUEST)
     
-    login(request, otp.user)
+    login(request, otp.user, backend='registrationApp.auth_backend.AuthenticationBackend')
 
     refresh = RefreshToken.for_user(otp.user)
 
@@ -60,7 +60,7 @@ def verify_otp(request):
     otp.code = None
     otp.save()
 
-    del request.session["otp_user_id"]
+    request.session.pop("otp_user_id", None)
 
     return response
 
@@ -115,5 +115,4 @@ def view_user(request, user_id):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
         return Response(serializer.data, status=status.HTTP_200_OK)

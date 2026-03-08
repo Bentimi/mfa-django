@@ -154,6 +154,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -164,6 +165,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "registrationApp.User"
 
 AUTHENTICATION_BACKENDS = [
+    'registrationApp.auth_backend.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',    
 ]
 
@@ -188,10 +190,12 @@ SIMPLE_JWT = {
 # CORS settings - control which origins can access your API
 CORS_ALLOWED_ORIGINS = [
     os.getenv("FRONTEND_URL"),
+    "http://localhost:5173"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF settings - validate request origins for CSRF protection
 CSRF_TRUSTED_ORIGINS = [
     os.getenv("FRONTEND_URL"),  # Same origins, but for CSRF validation
+    "http://localhost:5173"
 ]
