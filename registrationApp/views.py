@@ -9,8 +9,8 @@ from rest_framework.decorators import api_view, permission_classes
 from userApp.models import Otp
 import random
 from django.utils import timezone
-from services.emails.welcome import send_otp_email
-from services.resend import send_email 
+# from services.emails.welcome import send_otp_email
+# from services.resend import send_email
 
 User = get_user_model()
 
