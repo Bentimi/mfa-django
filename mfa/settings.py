@@ -29,14 +29,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = True
+# DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
-# RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
-# if RENDER_EXTERNAL_HOSTNAME:
-#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -50,6 +46,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'corsheaders',
+    # 'anymail',
 
     #drf
     'rest_framework_simplejwt',
@@ -64,7 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Add this line
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -96,26 +93,26 @@ WSGI_APPLICATION = "mfa.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.getenv("DATABASE_NAME"),
-#         "USER": os.getenv("DATABASE_USER"),
-#         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-#         "HOST": os.getenv("DATABASE_HOST"),
-#         "PORT": os.getenv("DATABASE_PORT"),
-#     }
-# }
-
 DATABASES = {
-    'default': dj_database_url.config(
-        # Replace with your local Postgres string if you have one, 
-        # otherwise it defaults to local SQLite
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": os.getenv("DATABASE_HOST"),
+        "PORT": os.getenv("DATABASE_PORT"),
+    }
 }
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         # Replace with your local Postgres string if you have one, 
+#         # otherwise it defaults to local SQLite
+#         default=os.getenv('DATABASE_URL'),
+#         conn_max_age=600,
+#         conn_health_checks=True,
+#     )
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -216,3 +213,15 @@ CSRF_TRUSTED_ORIGINS = [
     os.getenv("FRONTEND_URL"),  # Same origins, but for CSRF validation
     "http://localhost:5173"
 ]
+
+# MailTrap
+
+# MAILTRAP_API_TOKEN = os.getenv('MAILTRAP_API_TOKEN')
+# EMAIL_BACKEND = "anymail.backends.mailtrap.EmailBackend"
+# DEFAULT_FROM_EMAIL = "noreply@demomailtrap.com"
+
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# ANYMAIL = {
+#     "RESEND_API_KEY": os.getenv("RESEND_API_KEY"),
+# }
+# DEFAULT_FROM_EMAIL = "onboarding@resend.dev"

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import Otp
+
 User = get_user_model()
 
 
@@ -20,3 +22,9 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'username']
+
+
+class getOtpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Otp
+        fields = '__all__'

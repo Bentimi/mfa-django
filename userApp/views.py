@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from userApp.serializers import OtpSerializer, UpdateUserSerializer, UserSerializer
+from userApp.serializers import OtpSerializer, UpdateUserSerializer, UserSerializer, getOtpSerializer
 from userApp.models import Otp
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -116,3 +116,10 @@ def view_user(request, user_id):
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getOtp(request):
+    otp = Otp.objects.all()
+    serializer = getOtpSerializer(otp, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

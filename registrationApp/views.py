@@ -9,6 +9,8 @@ from rest_framework.decorators import api_view, permission_classes
 from userApp.models import Otp
 import random
 from django.utils import timezone
+from services.emails.welcome import send_otp_email
+from services.resend import send_email 
 
 User = get_user_model()
 
@@ -44,11 +46,14 @@ def login_user(request):
             }
         )
 
+        # send_otp_email(user, otp=otp_code)
+        # send_email(user, otp=otp_code)
+
         # store user in session
         request.session["otp_user_id"] = user.id
         # session  = request.session['otp_user_id']
         # print("Session user id:", session)
-        print(f"OTP for user {user.email}: {otp_code}")  # Log OTP to console for testing
+        print(f"OTP for user {user.email}: {otp_code}")
         return Response({
             "message": "OTP sent to your email", "otp_code": otp_code
             }, status=status.HTTP_200_OK)
