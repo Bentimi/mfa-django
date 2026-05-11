@@ -196,7 +196,7 @@ SIMPLE_JWT = {
     # Cookie Settings
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_HTTP_ONLY': True,
-    'AUTH_COOKIE_SECURE': False,    # Note: Set to True in production (requires HTTPS)
+    'AUTH_COOKIE_SECURE': False,
     'AUTH_COOKIE_SAMESITE': 'Lax',
 }
 
@@ -213,8 +213,16 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-# MailTrap
+# Gmail SMTP Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
+# MailTrap (legacy - kept for reference)
 # MAILTRAP_API_TOKEN = os.getenv('MAILTRAP_API_TOKEN')
 # EMAIL_BACKEND = "anymail.backends.mailtrap.EmailBackend"
 # DEFAULT_FROM_EMAIL = "noreply@demomailtrap.com"

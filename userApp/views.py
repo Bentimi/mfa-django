@@ -9,6 +9,7 @@ from userApp.models import Otp
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.views.decorators.csrf import ensure_csrf_cookie
+from services.email_service import send_login_notification
 
 
 User =  get_user_model()
@@ -35,6 +36,11 @@ def verify_otp(request):
         return Response({"error": "OTP has expired"}, status=status.HTTP_400_BAD_REQUEST)
     
     login(request, otp.user, backend='registrationApp.auth_backend.AuthenticationBackend')
+
+    # Send login notification email
+    ip_address = request.META.get('REMOTE_ADDR')
+    user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown')
+    send_login_notification(otp.user, ip_address=ip_address, device_info=user_agent)
 
     refresh = RefreshToken.for_user(otp.user)
 

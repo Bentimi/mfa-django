@@ -9,8 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from userApp.models import Otp
 import random
 from django.utils import timezone
-# from services.emails.welcome import send_otp_email
-# from services.resend import send_email
+from services.email_service import send_welcome_email, send_otp_email
 
 User = get_user_model()
 
@@ -24,6 +23,10 @@ def register_User(request):
         user = serializer.save()
         user.set_password(serializer.validated_data['password'])
         user.save()
+
+        # Send welcome email
+        send_welcome_email(user)
+
         return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,16 +49,16 @@ def login_user(request):
             }
         )
 
-        # send_otp_email(user, otp=otp_code)
-        # send_email(user, otp=otp_code)
+        # Send OTP email
+        send_otp_email(user, otp=otp_code)
 
         # store user in session
         request.session["otp_user_id"] = user.id
         # session  = request.session['otp_user_id']
         # print("Session user id:", session)
-        print(f"OTP for user {user.email}: {otp_code}")
+        # print(f"OTP for user {user.email}: {otp_code}")
         return Response({
-            "message": "OTP sent to your email", "otp_code": otp_code
+            "message": "OTP sent to your email"
             }, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
